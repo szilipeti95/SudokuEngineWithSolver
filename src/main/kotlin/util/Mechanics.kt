@@ -119,9 +119,9 @@ class Mechanics(private val sudokuBoard: Board) {
         return found
     }
 
-    fun scanRowAt(x: Int, y: Int, pos: Int): Int {
+    private fun scanRowAt(x: Int, y: Int, pos: Int): Int {
         var current = sudokuBoard.getDigit(pos)
-        val currentList = current.clone() as ArrayList<Int>
+        val currentList = current.value.toMutableList()
         for (i in 0 until sudokuBoard.numberCount) {
             current = sudokuBoard.getDigit(sudokuBoard.getPos(i, y))
             if (i != x && current.type == Digit.ValueType.GUESS) {
@@ -140,9 +140,9 @@ class Mechanics(private val sudokuBoard: Board) {
         }
     }
 
-    fun scanColumnAt(x: Int, y: Int, pos: Int): Int {
+    private fun scanColumnAt(x: Int, y: Int, pos: Int): Int {
         var current = sudokuBoard.getDigit(pos)
-        val currentList = current.clone() as ArrayList<Int>
+        val currentList = current.value.toMutableList()
         for (i in 0 until sudokuBoard.numberCount) {
             current = sudokuBoard.getDigit(sudokuBoard.getPos(x, i))
             if (i != y && current.type == Digit.ValueType.GUESS) {
@@ -161,9 +161,9 @@ class Mechanics(private val sudokuBoard: Board) {
         }
     }
 
-    fun scanBoxAt(x: Int, y: Int, pos: Int): Int {
+    private fun scanBoxAt(x: Int, y: Int, pos: Int): Int {
         var current = sudokuBoard.getDigit(pos)
-        val currentList = current.clone() as ArrayList<Int>
+        val currentList = current.value.toMutableList()
 
         var fromPos = sudokuBoard.getPos(
             x / sudokuBoard.boxCountInLine * sudokuBoard.boxCountInLine,
@@ -199,24 +199,21 @@ class Mechanics(private val sudokuBoard: Board) {
         val current = sudokuBoard.getDigit(pos)
         var scan = 1
         if (current.type == Digit.ValueType.GUESS) {
-            scan = scanRowAt(x, y, pos)
-            if (scan <= 0) {
-                scan = scanColumnAt(x, y, pos)
-                if (scan <= 0) {
-                    scan = scanBoxAt(x, y, pos)
-                    if (scan > 0) {
+            if (scanRowAt(x, y, pos) <= 0) {
+                if (scanColumnAt(x, y, pos) <= 0) {
+                    if (scanBoxAt(x, y, pos) > 0) {
                         if (scanned)
-                            current.add(scan, Digit.ValueType.NUMBER)
+                            current.add(scanBoxAt(x, y, pos), Digit.ValueType.NUMBER)
                         return true
                     }
                 } else {
                     if (scanned)
-                        current.add(scan, Digit.ValueType.NUMBER)
+                        current.add(scanColumnAt(x, y, pos), Digit.ValueType.NUMBER)
                     return true
                 }
             } else {
                 if (scanned)
-                    current.add(scan, Digit.ValueType.NUMBER)
+                    current.add(scanRowAt(x, y, pos), Digit.ValueType.NUMBER)
                 return true
             }
         }
@@ -245,7 +242,7 @@ class Mechanics(private val sudokuBoard: Board) {
         for (i in 0 until sudokuBoard.boxCount) {
             val current = sudokuBoard.getDigit(i)
             if (current.type == Digit.ValueType.NUMBER) {
-                if (current.get(0) != sudokuBoard.getAnswer(i)) {
+                if (current[0] != sudokuBoard.getAnswer(i)) {
                     val xPos = sudokuBoard.getX(i)
                     val yPos = sudokuBoard.getY(i)
                     sudokuBoard.highlight.add(Highlight(xPos, yPos, Color.RED))
