@@ -125,12 +125,12 @@ public class Images {
 	    	break;
 		}
 	}
-	public BufferedImage getImg(int pos, Digit.VALUE_TYPE type){
-		if(type == Digit.VALUE_TYPE.NUMBER)
+	public BufferedImage getImg(int pos, Digit.ValueType type){
+		if(type == Digit.ValueType.NUMBER)
 			return images[pos-1][1];
-		else if(type == Digit.VALUE_TYPE.CLUE)
+		else if(type == Digit.ValueType.CLUE)
 			return images[pos-1][0];
-		else if(type == Digit.VALUE_TYPE.GUESS)
+		else if(type == Digit.ValueType.GUESS)
 			return images[pos-1][2];
 		return null;
 	}

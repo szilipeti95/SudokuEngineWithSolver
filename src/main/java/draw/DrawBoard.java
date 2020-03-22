@@ -6,7 +6,6 @@ import util.Highlight;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class DrawBoard extends JPanel{
 	/**
@@ -31,14 +30,22 @@ public class DrawBoard extends JPanel{
 
 	private int selectedMode = 0;
 	private Board sudokuBoard;
-	private ArrayList<Highlight> toHighlight;
 	private Images imgs;
 	private String solverType;
+
+	private Integer[] posX;
+	private Integer[] posY;
 	
-	
-	public DrawBoard(Board sb, ArrayList<Highlight> high, String type){
+	public DrawBoard(Board sb, String type){
 		sudokuBoard = sb;
-		
+
+		posX = new Integer[sb.getBoxCount()];
+		posY = new Integer[sb.getBoxCount()];
+		for(int i=0; i<sb.getBoxCount(); i++){
+			posX[i] = new Integer(0);
+			posY[i] = new Integer(0);
+		}
+
 		margin = 30;
 		if(sudokuBoard.getNumberCount()>= 12)
 			boxSize = 36;
@@ -49,8 +56,8 @@ public class DrawBoard extends JPanel{
 		lineThinSize = 2;
 		posSelected = 0;
 		
-		boardRowPixelLength = (sudokuBoard.getBoxHeight() + 1) * lineBoldSize + sudokuBoard.getBoxHeight() * (sudokuBoard.getBoxWidth() - 1) * lineThinSize + sudokuBoard.getNumberCount() * boxSize;
-		boardColumnPixelLength = (sudokuBoard.getBoxWidth() + 1) * lineBoldSize + sudokuBoard.getBoxWidth() * (sudokuBoard.getBoxHeight() - 1) * lineThinSize + sudokuBoard.getNumberCount() * boxSize;
+		boardRowPixelLength = (sudokuBoard.getBoxCountInColumn() + 1) * lineBoldSize + sudokuBoard.getBoxCountInColumn() * (sudokuBoard.getBoxCountInLine() - 1) * lineThinSize + sudokuBoard.getNumberCount() * boxSize;
+		boardColumnPixelLength = (sudokuBoard.getBoxCountInLine() + 1) * lineBoldSize + sudokuBoard.getBoxCountInLine() * (sudokuBoard.getBoxCountInColumn() - 1) * lineThinSize + sudokuBoard.getNumberCount() * boxSize;
 		if(sudokuBoard.getNumberCount() == 16){
 			panelHeight = 2*margin + boardRowPixelLength;
 			panelWidth = 3*margin + 2*boxSize + lineThinSize + boardColumnPixelLength;
@@ -60,7 +67,6 @@ public class DrawBoard extends JPanel{
 			panelHeight = 3*margin + 2*boxSize + lineThinSize + boardColumnPixelLength;
 		}
 		setFocusable(true);
-		toHighlight = high;
 		solverType = "";
 		setPreferredSize(new Dimension(panelWidth, panelHeight));
 		int PointX;
@@ -68,14 +74,14 @@ public class DrawBoard extends JPanel{
 		for(int i = 0; i<sudokuBoard.getNumberCount(); i++){
 			PointX = margin + lineBoldSize;
 			for(int j=0; j<sudokuBoard.getNumberCount(); j++){
-				sb.setPosX(sb.getPos(j, i), PointX);
-				sb.setPosY(sb.getPos(j, i), PointY);
+				setPosX(sb.getPos(j, i), PointX);
+				setPosY(sb.getPos(j, i), PointY);
 				PointX += boxSize + lineThinSize;
-				if((j+1) % sudokuBoard.getBoxWidth() == 0)
+				if((j+1) % sudokuBoard.getBoxCountInLine() == 0)
 					PointX += lineBoldSize - lineThinSize;
 			}
 			PointY += boxSize + lineThinSize;
-			if((i+1) % sudokuBoard.getBoxHeight() == 0)
+			if((i+1) % sudokuBoard.getBoxCountInColumn() == 0)
 				PointY += lineBoldSize - lineThinSize;
 		}
 		imgs = new Images(type);
@@ -87,7 +93,7 @@ public class DrawBoard extends JPanel{
 		g.fillRect(PointToDraw, margin, lineBoldSize, boardColumnPixelLength);
 		PointToDraw += boxSize + lineBoldSize;
         for (int i = 1; i < sudokuBoard.getNumberCount() + 1; i++){
-            if (i % sudokuBoard.getBoxWidth() == 0){
+            if (i % sudokuBoard.getBoxCountInLine() == 0){
                 g.fillRect(PointToDraw, margin, lineBoldSize, boardColumnPixelLength);
                 PointToDraw += boxSize + lineBoldSize;
             }
@@ -102,7 +108,7 @@ public class DrawBoard extends JPanel{
         g.fillRect(margin, PointToDraw, boardRowPixelLength, lineBoldSize);
         PointToDraw += boxSize + lineBoldSize;
         for (int i = 1; i < sudokuBoard.getNumberCount() + 1; i++){
-            if (i % sudokuBoard.getBoxHeight() == 0) {
+            if (i % sudokuBoard.getBoxCountInColumn() == 0) {
                 g.fillRect(margin, PointToDraw, boardRowPixelLength, lineBoldSize);
                 PointToDraw += boxSize + lineBoldSize;
             }
@@ -113,6 +119,20 @@ public class DrawBoard extends JPanel{
             }
         }
 	}
+
+	public int getPosX(int pos) {
+		return posX[pos];
+	}
+	public void setPosX(int pos, int value) {
+		this.posX[pos] = new Integer(value);
+	}
+	public int getPosY(int pos) {
+		return posY[pos];
+	}
+	public void setPosY(int pos, int value) {
+		this.posY[pos] = new Integer(value);
+	}
+
 	public void paintChoosers(Graphics g){
 		if(sudokuBoard.getNumberCount() == 16){
 			int chooserLengthInPixel = sudokuBoard.getNumberCount()*boxSize + lineThinSize * (sudokuBoard.getNumberCount() + 1);
@@ -129,7 +149,7 @@ public class DrawBoard extends JPanel{
 	        }
 	        int numPosition = numSelectorPosY =  panelHeight/2 - (chooserLengthInPixel / 2) + lineThinSize;
 	    	for(int i=1; i<sudokuBoard.getNumberCount() + 1; i++){
-	    		g.drawImage(imgs.getImg(i, Digit.VALUE_TYPE.NUMBER), chooserXPosition, numPosition, this);
+	    		g.drawImage(imgs.getImg(i, Digit.ValueType.NUMBER), chooserXPosition, numPosition, this);
 				numPosition += boxSize + lineThinSize;
 	        }
 	    	
@@ -159,7 +179,7 @@ public class DrawBoard extends JPanel{
 	        }
 	        int numPosition = numSelectorPosX =  panelWidth/2 - (chooserLengthInPixel / 2) + lineThinSize;
 			for(int i=1; i<sudokuBoard.getNumberCount() + 1; i++){
-				g.drawImage(imgs.getImg(i, Digit.VALUE_TYPE.NUMBER), numPosition, chooserYPosition, this);
+				g.drawImage(imgs.getImg(i, Digit.ValueType.NUMBER), numPosition, chooserYPosition, this);
 				numPosition += boxSize + lineThinSize;
 	        }
 	    	
@@ -178,8 +198,8 @@ public class DrawBoard extends JPanel{
 	public void paintNumbers(Graphics g){
 		for(int i = 0; i<sudokuBoard.getNumberCount(); i++){
 			for(int j=0; j<sudokuBoard.getNumberCount(); j++){
-				int toX = sudokuBoard.getPosX(sudokuBoard.getPos(j, i)) ;
-				int toY = sudokuBoard.getPosY(sudokuBoard.getPos(j, i)) ;
+				int toX = getPosX(sudokuBoard.getPos(j, i)) ;
+				int toY = getPosY(sudokuBoard.getPos(j, i)) ;
 				Digit current = sudokuBoard.getDigit(j,i);
 				for(int k=0; k<current.size(); k++){
 			        g.drawImage(imgs.getImg(current.get(k), current.getType()), toX,toY, this);
@@ -194,13 +214,18 @@ public class DrawBoard extends JPanel{
 		g.fillRect(0, 0, panelWidth, panelHeight);
 		paintBoard(g);
 		paintChoosers(g);
-		while(!toHighlight.isEmpty()){
-			Highlight h = toHighlight.remove(0);
+		while(!sudokuBoard.getHighlight().isEmpty()){
+			Highlight h = sudokuBoard.getHighlight().remove(0);
 			g.setColor(h.getColor());
-			g.fillRect(h.getX(), h.getY(), boxSize, boxSize);
+			int pos = sudokuBoard.getPos(h.getX(), h.getY());
+			int posX = getPosX(pos);
+			int posY = getPosY(pos);
+
+			System.out.println("Highlight position x: " + h.getX() + " y: " + h.getY());
+			g.fillRect(posX, posY, boxSize, boxSize);
 		}
 		if(posSelected != -1)
-			g.drawImage(imgs.getImg(1), sudokuBoard.getPosX(posSelected),sudokuBoard.getPosY(posSelected), this);
+			g.drawImage(imgs.getImg(1), getPosX(posSelected), getPosY(posSelected), this);
 
 		paintNumbers(g);
 		g.setColor(Color.BLACK);

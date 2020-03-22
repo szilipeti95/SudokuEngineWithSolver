@@ -5,28 +5,21 @@ import java.io.*
 class Board : Serializable {
     private var puzzle: MutableList<Digit>
     private var answer: MutableList<Int>
-    var boxHeight: Int = 0
-    var boxWidth: Int = 0
+
+    var highlight: MutableList<Highlight> = mutableListOf()
+    var boxCountInColumn: Int = 0
+    var boxCountInLine: Int = 0
     var numberCount: Int = 0
     var boxCount: Int = 0
-
-    private var posX: MutableList<Int>
-    private var posY: MutableList<Int>
 
     constructor(x: Int, y: Int) {
         this.numberCount = x * y
         this.boxCount = numberCount * numberCount
         this.puzzle = mutableListOf()
-        this.boxHeight = y
-        this.boxWidth = x
+        this.boxCountInColumn = y
+        this.boxCountInLine = x
         for (i in 0 until boxCount) {
             puzzle.add(i, Digit())
-        }
-        posX = mutableListOf()
-        posY = mutableListOf()
-        for (i in 0 until boxCount) {
-            posX.add(i, 0)
-            posY.add(i, 0)
         }
         answer = mutableListOf()
     }
@@ -35,16 +28,10 @@ class Board : Serializable {
         this.numberCount = x * y
         this.boxCount = numberCount * numberCount
         this.puzzle = mutableListOf()
-        this.boxHeight = y
-        this.boxWidth = x
+        this.boxCountInColumn = y
+        this.boxCountInLine = x
         for (i in 0 until boxCount) {
             puzzle.add(i, Digit())
-        }
-        posX = mutableListOf()
-        posY = mutableListOf()
-        for (i in 0 until boxCount) {
-            posX.add(i, 0)
-            posY.add(i, 0)
         }
         answer = mutableListOf()
         try {
@@ -59,7 +46,7 @@ class Board : Serializable {
                 for (i in 0 until numberCount) {
                     number = Integer.parseInt(numbers[i])
                     if (number != 0) {
-                        puzzle[count] = Digit(number, Digit.VALUE_TYPE.CLUE)
+                        puzzle[count] = Digit(number, Digit.ValueType.CLUE)
                     }
                     count++
                 }
@@ -79,6 +66,14 @@ class Board : Serializable {
             e.printStackTrace()
         }
 
+    }
+
+    fun getX(pos: Int): Int {
+        return pos % numberCount
+    }
+
+    fun getY(pos: Int): Int {
+        return pos / numberCount
     }
 
     fun getPos(x: Int, y: Int): Int {
@@ -107,22 +102,6 @@ class Board : Serializable {
 
     fun setAnswer(answer: Int, pos: Int) {
         this.answer[pos] = answer
-    }
-
-    fun getPosX(pos: Int): Int {
-        return posX[pos]
-    }
-
-    fun setPosX(pos: Int, value: Int) {
-        this.posX[pos] = value
-    }
-
-    fun getPosY(pos: Int): Int {
-        return posY[pos]
-    }
-
-    fun setPosY(pos: Int, value: Int) {
-        this.posY[pos] = value
     }
 
     fun copy(): Board? {

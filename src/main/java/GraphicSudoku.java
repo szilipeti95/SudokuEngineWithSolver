@@ -2,7 +2,6 @@ import draw.DrawBoard;
 import draw.HelpFrame;
 import util.Board;
 import util.Digit;
-import util.Highlight;
 import util.Mechanics;
 
 import javax.imageio.ImageIO;
@@ -50,7 +49,6 @@ public class GraphicSudoku extends JFrame{
 	private Mechanics sudokuMechanics;
 	private Map<String, ArrayList<Board>> savedBoards;
 	private String type;
-	private ArrayList<Highlight> toHighlight;
     private Random randomGenerator;
 	@SuppressWarnings("unchecked")
 	public GraphicSudoku(){
@@ -128,7 +126,6 @@ public class GraphicSudoku extends JFrame{
 		}
 	
 		randomGenerator = new Random();
-		toHighlight = new ArrayList<>();
 		type = "3x3";
 		/*
 		try {
@@ -150,8 +147,8 @@ public class GraphicSudoku extends JFrame{
 			this.remove(p);
 		}catch(NullPointerException e){}
 		sudokuBoard = sb;
-		p = new DrawBoard(sudokuBoard, toHighlight, type);
-		sudokuMechanics = new Mechanics(sudokuBoard, toHighlight);
+		p = new DrawBoard(sudokuBoard, type);
+		sudokuMechanics = new Mechanics(sudokuBoard);
 		this.add(p);
 		this.pack();
 		p.requestFocus();
@@ -259,12 +256,12 @@ public class GraphicSudoku extends JFrame{
 			
 			if(arg0.getX() > p.getMargin() && arg0.getY() > p.getMargin() && arg0.getX() < p.getMargin() + p.getBoardRowPixelLength() && arg0.getY() <p.getMargin() + p.getBoardColumnPixelLength()){
 				
-				int checkX = sudokuBoard.getPosX(0);
-				int checkY = sudokuBoard.getPosY(0);
+				int checkX = p.getPosX(0);
+				int checkY = p.getPosY(0);
 				int pos = 0;
 				while(pos < sudokuBoard.getBoxCount()){
-					checkX = sudokuBoard.getPosX(pos);
-					checkY = sudokuBoard.getPosY(pos);
+					checkX = p.getPosX(pos);
+					checkY = p.getPosY(pos);
 					if(checkX < arg0.getX() && checkX + p.getBoxSize() > arg0.getX() && checkY < arg0.getY() && checkY + p.getBoxSize() > arg0.getY())
 						break;
 					pos++;
@@ -278,10 +275,10 @@ public class GraphicSudoku extends JFrame{
 							sudokuBoard.getDigit(pos).remove(p.getSelectedNumber());
 					}
 					else if(arg0.getButton() == MouseEvent.BUTTON1 && p.getSelectedMode() == 0){
-						sudokuBoard.getDigit(pos).add(p.getSelectedNumber(), Digit.VALUE_TYPE.NUMBER);
+						sudokuBoard.getDigit(pos).add(p.getSelectedNumber(), Digit.ValueType.NUMBER);
 					}
 					else if(arg0.getButton() == MouseEvent.BUTTON1 && p.getSelectedMode() == 1){
-						sudokuBoard.getDigit(pos).add(p.getSelectedNumber(), Digit.VALUE_TYPE.GUESS);
+						sudokuBoard.getDigit(pos).add(p.getSelectedNumber(), Digit.ValueType.GUESS);
 					}
 				}
 			}
@@ -343,16 +340,16 @@ public class GraphicSudoku extends JFrame{
 				if(e.getKeyChar() > '0' && e.getKeyChar() <= '9' && sudokuBoard.getNumberCount() >= e.getKeyChar()-'0'){
 					p.setSelectedNumber(e.getKeyChar()-'0');
 					if(p.getSelectedMode() == 0)
-						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.VALUE_TYPE.NUMBER);
+						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.ValueType.NUMBER);
 					else if(p.getSelectedMode() == 1)
-						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.VALUE_TYPE.GUESS);
+						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.ValueType.GUESS);
 				}
 				else if(e.getKeyChar() >= 'a' && e.getKeyChar() <= 'g' && sudokuBoard.getNumberCount() >= (e.getKeyChar()-'a' + 10)){
 					p.setSelectedNumber(e.getKeyChar()-'a' + 10);
 					if(p.getSelectedMode() == 0)
-						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.VALUE_TYPE.NUMBER);
+						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.ValueType.NUMBER);
 					else if(p.getSelectedMode() == 1)
-						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.VALUE_TYPE.GUESS);
+						sudokuBoard.getDigit(p.getPosSelected()).add(p.getSelectedNumber(), Digit.ValueType.GUESS);
 				}
 				else if(e.getKeyCode() == KeyEvent.VK_DELETE){
 					if(p.getSelectedMode() == 0)
