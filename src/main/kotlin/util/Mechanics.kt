@@ -20,7 +20,7 @@ class Mechanics(private val sudokuBoard: Board) {
             for (i in 1 until sudokuBoard.numberCount + 1)
                 check.add(i)
             for (i in 0 until sudokuBoard.numberCount) {
-                val current = sudokuBoard.getDigit(sudokuBoard.getPos(i, y))
+                val current = sudokuBoard.getDigit(i, y)
                 if (i != x && current.size() == 1 && current.type != Digit.ValueType.GUESS) {
                     check.remove(current.get(0))
                 }
@@ -28,7 +28,7 @@ class Mechanics(private val sudokuBoard: Board) {
             sudokuBoard.getDigit(pos).type = Digit.ValueType.GUESS
             return check
         } else
-            return sudokuBoard.getDigit(sudokuBoard.getPos(x, y)).value
+            return sudokuBoard.getDigit(x, y).value
     }
 
     fun checkColumnAt(x: Int, y: Int, pos: Int): MutableList<Int> {
@@ -40,14 +40,14 @@ class Mechanics(private val sudokuBoard: Board) {
             while (i < sudokuBoard.boxCount) {
                 val current = sudokuBoard.getDigit(i)
                 if (i != pos && current.size() == 1 && current.type != Digit.ValueType.GUESS) {
-                    check.remove(current.get(0))
+                    check.remove(current[0])
                 }
                 i += sudokuBoard.numberCount
             }
             sudokuBoard.getDigit(pos).type = Digit.ValueType.GUESS
             return check
         } else
-            return sudokuBoard.getDigit(sudokuBoard.getPos(x, y)).value
+            return sudokuBoard.getDigit(x, y).value
     }
 
     fun checkBoxAt(x: Int, y: Int, pos: Int): MutableList<Int> {
@@ -72,7 +72,7 @@ class Mechanics(private val sudokuBoard: Board) {
             sudokuBoard.getDigit(pos).type = Digit.ValueType.GUESS
             return check
         } else
-            return sudokuBoard.getDigit(sudokuBoard.getPos(x, y)).value
+            return sudokuBoard.getDigit(x, y).value
     }
 
     fun checkAt(x: Int, y: Int): Boolean {
@@ -123,7 +123,7 @@ class Mechanics(private val sudokuBoard: Board) {
         var current = sudokuBoard.getDigit(pos)
         val currentList = current.value.toMutableList()
         for (i in 0 until sudokuBoard.numberCount) {
-            current = sudokuBoard.getDigit(sudokuBoard.getPos(i, y))
+            current = sudokuBoard.getDigit(i, y)
             if (i != x && current.type == Digit.ValueType.GUESS) {
                 for (j in 0 until current.size()) {
                     currentList.remove(current.get(j))
@@ -144,7 +144,7 @@ class Mechanics(private val sudokuBoard: Board) {
         var current = sudokuBoard.getDigit(pos)
         val currentList = current.value.toMutableList()
         for (i in 0 until sudokuBoard.numberCount) {
-            current = sudokuBoard.getDigit(sudokuBoard.getPos(x, i))
+            current = sudokuBoard.getDigit(x, i)
             if (i != y && current.type == Digit.ValueType.GUESS) {
                 for (j in 0 until current.size()) {
                     currentList.remove(current.get(j))
@@ -196,7 +196,7 @@ class Mechanics(private val sudokuBoard: Board) {
 
     fun scanAt(x: Int, y: Int): Boolean {
         val pos = sudokuBoard.getPos(x, y)
-        val current = sudokuBoard.getDigit(pos)
+        val current = sudokuBoard.getDigit(x, y)
         var scan = 1
         if (current.type == Digit.ValueType.GUESS) {
             if (scanRowAt(x, y, pos) <= 0) {

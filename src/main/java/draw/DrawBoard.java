@@ -74,8 +74,8 @@ public class DrawBoard extends JPanel{
 		for(int i = 0; i<sudokuBoard.getNumberCount(); i++){
 			PointX = margin + lineBoldSize;
 			for(int j=0; j<sudokuBoard.getNumberCount(); j++){
-				setPosX(sb.getPos(j, i), PointX);
-				setPosY(sb.getPos(j, i), PointY);
+				setPosX(getPos(j, i), PointX);
+				setPosY(getPos(j, i), PointY);
 				PointX += boxSize + lineThinSize;
 				if((j+1) % sudokuBoard.getBoxCountInLine() == 0)
 					PointX += lineBoldSize - lineThinSize;
@@ -119,7 +119,9 @@ public class DrawBoard extends JPanel{
             }
         }
 	}
-
+	private int getPos(int x, int y) {
+		return y * sudokuBoard.getNumberCount() + x;
+	}
 	public int getPosX(int pos) {
 		return posX[pos];
 	}
@@ -198,8 +200,8 @@ public class DrawBoard extends JPanel{
 	public void paintNumbers(Graphics g){
 		for(int i = 0; i<sudokuBoard.getNumberCount(); i++){
 			for(int j=0; j<sudokuBoard.getNumberCount(); j++){
-				int toX = getPosX(sudokuBoard.getPos(j, i)) ;
-				int toY = getPosY(sudokuBoard.getPos(j, i)) ;
+				int toX = getPosX(getPos(j, i)) ;
+				int toY = getPosY(getPos(j, i)) ;
 				Digit current = sudokuBoard.getDigit(j,i);
 				for(int k=0; k<current.size(); k++){
 			        g.drawImage(imgs.getImg(current.get(k), current.getType()), toX,toY, this);
@@ -217,7 +219,7 @@ public class DrawBoard extends JPanel{
 		while(!sudokuBoard.getHighlight().isEmpty()){
 			Highlight h = sudokuBoard.getHighlight().remove(0);
 			g.setColor(h.getColor());
-			int pos = sudokuBoard.getPos(h.getX(), h.getY());
+			int pos = getPos(h.getX(), h.getY());
 			int posX = getPosX(pos);
 			int posY = getPosY(pos);
 

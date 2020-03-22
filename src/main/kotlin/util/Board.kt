@@ -76,6 +76,8 @@ class Board : Serializable {
         return pos / numberCount
     }
 
+    /// TODO: !!s
+    @Deprecated("Should be private", ReplaceWith("y * this.numberCount + x"))
     fun getPos(x: Int, y: Int): Int {
         return y * this.numberCount + x
     }
